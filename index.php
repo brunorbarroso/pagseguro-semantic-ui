@@ -32,11 +32,11 @@ $meta = $app->metadata();
         <div class="fields">  
           <div class="twelve wide field">
             <label>Nome completo</label>
-              <input type="text" name="shipping[first-name]" placeholder="nome completo">
+              <input type="text" name="creditCardHolderName" placeholder="nome completo">
           </div>
           <div class="five wide field">
             <label>Data de Nascimento</label>
-            <input type="text" name="shipping[address]" class="placeholder" id="placeholder" placeholder="xx/xx/xxxx">
+            <input type="text" name="creditCardHolderBirthDate" class="placeholder" id="placeholder" placeholder="xx/xx/xxxx">
           </div>
         </div>
       </div>
@@ -44,17 +44,17 @@ $meta = $app->metadata();
         <div class="fields">         
           <div class="twelve wide field">
             <label>CPF</label>
-            <input type="text" name="shipping[address-2]" class="cpf" placeholder="xxx.xxx.xxx-xx">
+            <input type="text" name="creditCardHolderCPF" class="cpf" placeholder="xxx.xxx.xxx-xx">
           </div>
           <div class="ten wide field">
             <div class="fields">
                 <div class="five wide field">
                   <label>DDD</label>
-                  <input type="text" name="shipping[address]" class="ddd" placeholder="xxx">
+                  <input type="text" name="creditCardHolderAreaCode" class="ddd" placeholder="xxx">
                 </div>
                 <div class="twelve wide field">
                   <label>Telefone</label>
-                  <input type="text" name="shipping[address]" class="phone" placeholder="x.xxxx-xxxx">
+                  <input type="text" name="creditCardHolderPhone" class="phone" placeholder="x.xxxx-xxxx">
                 </div>
             </div>
           </div>
@@ -66,24 +66,24 @@ $meta = $app->metadata();
           <div class="five wide field">
             <label>CEP</label>
             <div class="ui icon input zipcode ">
-              <input type="text" name="cep" class="cep" id="cep" placeholder="xxxxx-xxx">
+              <input type="text" name="shippingAddressPostalCode" class="cep" id="cep" placeholder="xxxxx-xxx">
               <i class="inverted circular search link icon searchzipcode"></i>
             </div>
           </div>
           <div class="twelve wide field">
             <label>Endereço</label>
-            <input type="text" name="logradouro" placeholder="rua, avenida, etc.">
+            <input type="text" name="shippingAddressStreet" placeholder="rua, avenida, etc.">
           </div>
           <div class="four wide field">
             <label>Número</label>
-            <input type="text" name="numero" placeholder="número">
+            <input type="text" name="shippingAddressNumber" placeholder="número">
           </div>
         </div>
       </div>
       <div class="two fields">
         <div class="field">
           <label>Estado</label>
-          <select name="uf" class="ui fluid dropdown">
+          <select name="shippingAddressState" class="ui fluid dropdown">
             <option value="">Escolha...</option>
             <option value="a">Acre</option>
             <option value="a">Alagoas</option>
@@ -116,21 +116,22 @@ $meta = $app->metadata();
         </div>
         <div class="field">
           <label>Cidade</label>
-          <select name="cidade" class="ui fluid dropdown">
+          <select name="shippingAddressCity" class="ui fluid dropdown">
             <option value="">Escolha...</option>
             <option value="Maracanaú">Maracanaú</option>
             <option value="Fortaleza">Fortaleza</option>
             <option value="a">Madalena</option>
           </select>
         </div>
+        <input type="hidden" name="shippingAddressCountry" value="BR">
         <div class="field">
           <label>Bairro</label>
-          <input type="text" name="bairro" placeholder="bairro">
+          <input type="text" name="shippingAddressDistrict" placeholder="bairro">
         </div>
       </div>
       <div class="field">
           <label>Complemento</label>
-          <textarea rows="2" name="complemento" placeholder="Complemento"></textarea>
+          <textarea rows="2" name="shippingAddressComplement" placeholder="Complemento"></textarea>
       </div>    
     
       <div id="formspayment">
