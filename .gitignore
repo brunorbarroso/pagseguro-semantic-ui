@@ -17,5 +17,7 @@
 !.vscode/extensions.json
 .history
 
+.env
+
 # End of https://www.gitignore.io/api/git,composer,visualstudiocode
 =======

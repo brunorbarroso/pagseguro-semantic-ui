@@ -1,11 +1,13 @@
-<?php
-require 'vendor/autoload.php';
+<?php require 'vendor/autoload.php';
 
-use \App\Payment;
+use \App\App;
 
-print_r(new Payment());
+$dotenv = new Dotenv\Dotenv(__DIR__);
+$dotenv->load();
 
-exit;
+$app = new App();
+$meta = $app->metadata();
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -16,6 +18,7 @@ exit;
     <title>Document</title>
     
     <link rel="stylesheet" type="text/css" href="https://semantic-ui.com/dist/semantic.min.css"> 
+    <script type="text/javascript" src="<?php echo $meta['javascriptURL']; ?>"></script>
   
 </head>
 <body>
@@ -242,121 +245,17 @@ exit;
 <script src="https://semantic-ui.com/dist/semantic.min.js"></script>
 <script src="assets/js/semantic.js"></script>
 <script src="assets/js/jquery.mask.js"></script>
-<script>
-  $('.ui.dropdown').dropdown();
-  $('.ui.checkbox').checkbox();
-  $('#context1 .menu .item')
-    .tab({
-      context: $('#context1')
-    })
-  ;
-  $('#formspayment .menu .item')
-    .tab({
-      // special keyword works same as above
-      context: 'parent'
-    })
-  ;
-  $('.generate').on('click', function(){
-    $(this).removeClass('green')
-    $(this).addClass('loading')
-  })
-  $('.searchzipcode').on('click', function(){
-    pesquisacep( $("input[name=cep]").val() )
-  })
-</script>
+<script src="assets/js/validation_form.js"></script>
 
 <!-- Adicionando Javascript -->
 <script type="text/javascript" >
-    
-    function limpa_formulário_cep() {
-            //Limpa valores do formulário de cep.
-            $("input[name=logradouro]").val("")
-            $("input[name=cidade]").val("")
-            $("input[name=uf]").val("")
-            $("input[name=numero]").val("")
-            $("input[name=bairro]").val("")
-            $("textarea[name=complemento]").val("")
-            $('.zipcode').removeClass('loading')
-    }
-
-    function meu_callback(conteudo) {
-        if (!("erro" in conteudo)) {
-            //Atualiza os campos com os valores.
-            $("input[name=logradouro]").val(conteudo.logradouro)
-            $("select[name=cidade]").val(conteudo.localidade).change()
-            $("select[name=uf]").val(conteudo.uf).change()
-            $("input[name=bairro]").val(conteudo.bairro);
-            $("textarea[name=complemento]").val(conteudo.complemento)
-        } //end if.
-        else {
-            //CEP não Encontrado.
-            limpa_formulário_cep();
-            $('.error.message').show()
-            $('.error.message').html("<p>CEP não encontrado.</p>")
-        }
-    }
-        
-    function pesquisacep(valor) {
-
-        //Nova variável "cep" somente com dígitos.
-        var cep = valor.replace(/\D/g, '');
-
-        //Verifica se campo cep possui valor informado.
-        if (cep != "") {
-
-            //Expressão regular para validar o CEP.
-            var validacep = /^[0-9]{8}$/;
-
-            //Valida o formato do CEP.
-            if(validacep.test(cep)) {
-
-                //Preenche os campos com "..." enquanto consulta webservice.
-                $("input[name=logradouro]").val("...")
-                $("input[name=cidade]").val("...")
-                $("input[name=uf]").val("...")
-                $("input[name=bairro]").val("...")
-                $("textarea[name=complemento]").val("...")
-                $('.zipcode').addClass('loading')
-
-                //Cria um elemento javascript.
-                var script = document.createElement('script');
-
-                //Sincroniza com o callback.
-                script.src = '//viacep.com.br/ws/'+ cep + '/json/?callback=meu_callback';
-
-                //Insere script no documento e carrega o conteúdo.
-                document.body.appendChild(script);
-
-                setTimeout(function() {
-                  $('.zipcode').removeClass('loading')
-                }, 500);
-
-            } //end if.
-            else {
-                //cep é inválido.
-                limpa_formulário_cep();
-                $('.error.message').show()
-                $('.error.message').html("<p>Formato de CEP inválido.</p>")
-            }
-        } //end if.
-        else {
-            //cep sem valor, limpa formulário.
-            limpa_formulário_cep();
-        }
-    };
-  
-    $('.cep').mask('00000-000');
-    $('.ddd').mask('(000)');
-    $('.phone').mask('0.0000-0000');
-    $('.placeholder').mask("00/00/0000", {placeholder: "__/__/____"});
-    $('.cpf').mask('000.000.000-00', {reverse: true});
 
     var valueTotal = 99.00;
         var paymentMethod = "eft";
 
         $(document).ready(function(){
 
-            PagSeguroDirectPayment.setSessionId('105bc23a74494e24b900e3d7ebba7513');
+            PagSeguroDirectPayment.setSessionId('<?php echo $meta['sessionId'] ?>');
             $(".formspayment .creditcard").hide();
             $(".formspayment .debit").hide();
             $(".formspayment .boleto").hide();

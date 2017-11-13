@@ -6,11 +6,11 @@ use App\Config;
 * Checkout transparent with PagSeguro
 */
 
-class Payment {
+class Gateway {
 
     protected $credentials;
     protected $mode = 'sandbox';
-    protected $config;
+    protected $config = array();
     protected $sessionId;
     protected $order = array();
 
@@ -28,8 +28,9 @@ class Payment {
     }
 
     public function setCredentials(){
-        $config = new Config();
-        $this->credentials = $config['pagseguro'][$this->getMode()]['credentials'];
+        $this->config = new Config();
+        $this->config = $this->config->getConfig();
+        $this->credentials = $this->config['pagseguro'][$this->getMode()]['credentials'];
     }
 
     public function getCredentials() {
@@ -37,11 +38,10 @@ class Payment {
     }
 
     private function getEnviromentData( $key ) {
-        $ci = get_instance();
-        if( isset( $config['pagseguro'][$key] ) )
-            return $config['pagseguro'][$key];
+        if( isset( $this->config['pagseguro'][$key] ) )
+            return $this->config['pagseguro'][$key];
 
-        return $config['pagseguro'][$this->getMode()][$key];
+        return $this->config['pagseguro'][$this->getMode()][$key];
     }
 
     public function getSessionURL() {

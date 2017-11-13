@@ -3,7 +3,8 @@
     "description": "Checkout transparent with PagSeguro and Semantic UI",
     "type": "library",
     "require": {
-        "pagseguro/pagseguro-php-sdk": "^3.3"
+        "pagseguro/pagseguro-php-sdk": "^3.3",
+        "vlucas/phpdotenv": "^2.4"
     },
     "license": "MIT",
     "authors": [
