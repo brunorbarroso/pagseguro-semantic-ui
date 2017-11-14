@@ -97,7 +97,7 @@ function limpa_formulário_cep() {
   };
 
   $('.cep').mask('00000-000');
-  $('.ddd').mask('(000)');
+  $('.ddd').mask('(00)');
   $('.phone').mask('0.0000-0000');
   $('.placeholder').mask("00/00/0000", {placeholder: "__/__/____"});
   $('.cpf').mask('000.000.000-00', {reverse: true});
