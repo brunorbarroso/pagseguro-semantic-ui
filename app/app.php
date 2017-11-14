@@ -29,12 +29,12 @@ class App {
     /**
      * @return mixed
      */
-    public function payment()
+    public function payment( $fields )
     {
         if ( !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest' ) {
 
             $app = new \App\Gateway( $this->config->config['pagseguro']['mode'] );
-            $order = $_POST;
+            $order = $fields;
             $orderExtra = array('paymentMode'=>'default',
                                 'currency'=>'BRL',
                                 'notificationURL'=>$_ENV['URL_NOTIFICATION']);

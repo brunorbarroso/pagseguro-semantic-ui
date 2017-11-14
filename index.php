@@ -147,23 +147,23 @@ $meta = $app->metadata();
                   </select>
                 </div>
                 <div class="field">
-                <select class="ui fluid search dropdown" name="cardExpirationYear">
-                    <option value="">Ano</option>
-                    <option value="1">2017</option>
-                    <option value="2">2018</option>
-                    <option value="3">2019</option>
-                    <option value="4">2020</option>
-                    <option value="5">2021</option>
-                    <option value="6">2022</option>
-                    <option value="7">2023</option>
-                    <option value="8">2024</option>
-                    <option value="9">2025</option>
-                    <option value="10">2026</option>
-                    <option value="11">2027</option>
-                    <option value="12">2028</option>
-                    <option value="12">2029</option>
-                    <option value="12">2030</option>
-                  </select>
+                    <select class="ui fluid search dropdown" name="cardExpirationYear">
+                        <option value="">Ano</option>
+                        <option value="1">2017</option>
+                        <option value="2">2018</option>
+                        <option value="3">2019</option>
+                        <option value="4">2020</option>
+                        <option value="5">2021</option>
+                        <option value="6">2022</option>
+                        <option value="7">2023</option>
+                        <option value="8">2024</option>
+                        <option value="9">2025</option>
+                        <option value="10">2026</option>
+                        <option value="11">2027</option>
+                        <option value="12">2028</option>
+                        <option value="12">2029</option>
+                        <option value="12">2030</option>
+                    </select>
                 </div>
               </div>
             </div>
@@ -183,30 +183,14 @@ $meta = $app->metadata();
         </div>
         <div class="ui tab segment" data-tab="debit">
           <div class="field">
-              <label>Lista de bancos</label>
-              <div class="ui selection dropdown">
-                <input type="hidden" name="card[type]">
-                <div class="default text">Escolha...</div>
-                <i class="dropdown icon"></i>
-                <div class="menu">
-                  <div class="item" data-value="mastercard">
-                    <img src="https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/68x30/bb.png">
-                    Banco do Brasil
-                  </div>
-                  <div class="item" data-value="visa">
-                    <img src="https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/68x30/banrisul.png">
-                    Barinsul
-                  </div>
-                  <div class="item" data-value="american">
-                    <img src="https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/68x30/bradesco.png">
-                    Bradesco
-                  </div>
-                  <div class="item" data-value="discover">
-                    <img src="https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/68x30/itau.png">
-                    Itaú
-                  </div>
-                </div>
+              <label>Lista de bancos</label> 
+                <div class="ui selection dropdown">
+                    <input type="hidden" name="bankDebit">
+                    <div class="default text">Escolha...</div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu list-bank"></div>
               </div>
+
           </div>
           <input type="hidden" name="eftName" />
           <button class="generate ui button green" id="debitPaymentButton">Salvar e Acessar o Banco</button>
@@ -233,6 +217,9 @@ $meta = $app->metadata();
 
         $(document).ready(function(){
             PagSeguroDirectPayment.setSessionId('<?php echo $meta['sessionId'] ?>');
+            $("div").find("[data-tab='creditcard']").hide()
+            $("div").find("[data-tab='debit']").hide()
+            $("div").find("[data-tab='boleto']").hide()
             setFormsPayments( valueTotal );
         });
 
@@ -280,11 +267,10 @@ $meta = $app->metadata();
                 brand: $( "input[name=creditCardBrandName]" ).val(),
                 maxInstallmentNoInterest: 2,
                     success: function(response) {
-                        $("#creditcard .list-parcel select").html("<option>Selecione</option>")
+                        $("<option>Escolha...</option>").appendTo("select[name=installmentQuantity]");
                         var parcels = response.installments[$("input[name=creditCardBrandName]").val()];
                         $.each(parcels, function (idx, itm) {
-                            $("#creditcard .list-parcel select").append("<option value="+itm.quantity+" data-valueParcel='"+itm.installmentAmount+"' data-extraAmount='"+itm.totalAmount+"'>"+itm.quantity+'x de R$ '+ itm.installmentAmount+' - Total R$ '+itm.totalAmount+"</option>");
-                            console.log('parcelas', itm.quantity+'x de R$ '+ itm.installmentAmount+' - Total R$ '+itm.totalAmount)
+                            $("<option value="+itm.quantity+" data-valueParcel='"+itm.installmentAmount+"' data-extraAmount='"+itm.totalAmount+"'>"+itm.quantity+'x R$ '+ itm.installmentAmount+' - Total R$ '+itm.totalAmount+"</option>").appendTo("select[name=installmentQuantity]");
                         });
                 }, error: function(response){
                     setError("Não foi possível liberar as parcelas. Dados do cartão inválido.");
@@ -311,8 +297,8 @@ $meta = $app->metadata();
                 cardNumber: $("input[name=cardNumber]").val(),
                 cvv: $("input[name=cardCvv]").val(),
                 brand: $("input[name=creditCardBrand]").val(),
-                expirationMonth: $("input[name=cardExpirationMonth]").val(),
-                expirationYear: $("input[name=cardExpirationYear]").val(),
+                expirationMonth: $("select[name=cardExpirationMonth]").val(),
+                expirationYear: $("select[name=cardExpirationYear] option:selected").text(),
                 success: function(response) {
                     if(typeof response.card.token !== 'undefined' && response.card.token.length > 0 ){
                         $( "input[name=creditCardToken]" ).val( response.card.token );
@@ -332,10 +318,10 @@ $meta = $app->metadata();
             if($("input[name=cardCvv]").val().length >= 3 ) {
                 if($("input[name=cardNumber]").val()==''){
                     setError( "Preencha o número do cartao." );
-                } else if($("input[name=cardExpirationMonth]").val()=='' && $("input[name=cardExpirationYear]").val()==''){
+                } else if($("select[name=cardExpirationMonth]").val()=='' && $("select[name=cardExpirationYear] option:selected").text()==''){
                     setError( "Preencha a data do cartão" );
                 }
-                if( $("input[name=cardNumber]").val().length > 0 && $("input[name=cardCvv]").val().length > 0 && $("input[name=cardExpirationMonth]").val().length > 0 && $("input[name=cardExpirationYear]").val().length > 0){
+                if( $("input[name=cardNumber]").val().length > 0 && $("input[name=cardCvv]").val().length > 0 && $("select[name=cardExpirationMonth]").val().length > 0 && $("select[name=cardExpirationYear] option:selected").text().length > 0){
                     createTokenCreditCard();
                     getBrandCreditCard();
                 } else {
@@ -357,32 +343,28 @@ $meta = $app->metadata();
                     success: function(response) { 
                         setHash();
                         $.each( response.paymentMethods, function(idx, item){
-                            $('#content').append("(" +item.name + ")" + item.name+"<br>")
                             if( item.name == 'BOLETO' ) {
-                                $("li .boleto").show();
+                                $("div").find("[data-tab='boleto']").removeAttr("style");
                             } else if( item.name == 'ONLINE_DEBIT' ) {
-                                $("li .debit").show();
+                                $("div").find("[data-tab='debit']").removeAttr("style");
                                 $.each(item.options, function(idx, itm){
-                                    $("#debit .list-bank ul").append("<li data-bank='"+itm.name+"' class='bank-flag "+itm.name+"'><img src='https://stc.pagseguro.uol.com.br"+itm.images.MEDIUM.path+"' /></li>");
+                                    $("<div class='item' data-value='"+itm.name+"'><img src='https://stc.pagseguro.uol.com.br"+itm.images.MEDIUM.path+"'>"+itm.displayName+"</div>").appendTo(".list-bank");
                                 });
-                                $("#debit .list-bank li").on('click', function(){
-                                    $("input[name=eftName]").val( $(this).data('bank') )
-                                });
-                            } else if( item.name == 'CREDIT_CARD' ) {
-                                $("li .creditcard").show();
-                                $.each(item.options, function(idx, itm){
-                                    //Exibindo os cartões de crédito
-                                    $("#creditcard .list-card ul").append("<li dataBank='"+itm.name+"' class='bank-flag "+itm.name+"'><img src='https://stc.pagseguro.uol.com.br"+itm.images.MEDIUM.path+"' /></li>");
+                                $("input[name=bankDebit]").on('change', function(){
+                                    $("input[name=eftName]").val( $(this).val() )
                                 })
+                            } else if( item.name == 'CREDIT_CARD' ) {
+                                $("div").find("[data-tab='creditcard']").removeAttr("style");
                             }
-                        } )
+                        })
                     }
             });
         };
     
         var getDataOrder = function () {
             var dataCard = {};
-            dataCard = {paymentMethod:paymentMethod,
+            dataCard = {
+                paymentMethod: paymentMethod,
                 receiverEmail:'brunobinfo@gmail.com',
                 itemId1:'0001',
                 itemDescription1:'Viagem Para Testar o Checkout',
@@ -393,36 +375,40 @@ $meta = $app->metadata();
                 senderHash:$("input[name=senderHash]").val()
             };
 
+            dataCard.senderName=$("input[name=creditCardHolderName]").val()
+            dataCard.senderAreaCode=$("input[name=creditCardHolderAreaCode]").val().replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-')
+            dataCard.senderPhone=$("input[name=creditCardHolderPhone]").val().replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-')
+            dataCard.senderCPF=$("input[name=creditCardHolderCPF]").val().replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-')
+
+            dataCard.shippingAddressStreet=$("input[name=shippingAddressStreet]").val()
+            dataCard.shippingAddressNumber=$("input[name=shippingAddressNumber]").val()
+            dataCard.shippingAddressComplement=$("input[name=shippingAddressComplement]").val()
+            dataCard.shippingAddressDistrict=$("input[name=shippingAddressDistrict]").val()
+            dataCard.shippingAddressPostalCode=$("input[name=shippingAddressPostalCode]").val().replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-')
+            dataCard.shippingAddressCity=$("select[name=shippingAddressCity]").val()
+            dataCard.shippingAddressState=$("select[name=shippingAddressState]").val()
+            dataCard.shippingAddressCountry=$("input[name=shippingAddressCountry]").val()
+            
+            dataCard.billingAddressStreet=$("input[name=shippingAddressStreet]").val().replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-')
+            dataCard.billingAddressNumber=$("input[name=shippingAddressNumber]").val().replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-')
+            dataCard.billingAddressComplement=$("input[name=shippingAddressComplement]").val();
+            dataCard.billingAddressDistrict=$("input[name=shippingAddressDistrict]").val();
+            dataCard.billingAddressPostalCode=$("input[name=shippingAddressPostalCode]").val().replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-')
+            dataCard.billingAddressCity=$("select[name=shippingAddressCity]").val();
+            dataCard.billingAddressState=$("select[name=shippingAddressState]").val();
+            dataCard.billingAddressCountry=$("input[name=shippingAddressCountry]").val();
+
             if( paymentMethod == 'creditcard' ) {
-                dataCard.senderName=$("#creditcard input[name=creditCardHolderName]").val();
-                dataCard.senderAreaCode=$("#creditcard input[name=creditCardHolderAreaCode]").val()
-                dataCard.senderPhone=$("#creditcard input[name=creditCardHolderPhone]").val()
-                dataCard.senderCPF=$("#creditcard input[name=creditCardHolderCPF]").val();
-                dataCard.shippingAddressStreet=$("input[name=billingAddressStreet]").val();
-                dataCard.shippingAddressNumber=$("input[name=billingAddressNumber]").val();
-                dataCard.shippingAddressComplement=$("input[name=billingAddressComplement]").val();
-                dataCard.shippingAddressDistrict=$("input[name=billingAddressDistrict]").val();
-                dataCard.shippingAddressPostalCode=$("input[name=billingAddressPostalCode]").val();
-                dataCard.shippingAddressCity=$("input[name=billingAddressCity]").val();
-                dataCard.shippingAddressState=$("input[name=billingAddressState]").val();
-                dataCard.shippingAddressCountry=$("input[name=billingAddressCountry]").val();
+
                 dataCard.extraAmount = Number((Number($("input[name=extraAmount]").val()).toFixed(2)-valueTotal)).toFixed(2);
                 dataCard.creditCardToken=$("input[name=creditCardToken]").val();
                 dataCard.installmentQuantity=$("select[name=installmentQuantity]").val();
                 dataCard.installmentValue=$('input[name=installmentValue]').val();
                 dataCard.creditCardHolderName=$("input[name=creditCardHolderName]").val();
-                dataCard.creditCardHolderCPF=$("input[name=creditCardHolderCPF]").val();
+                dataCard.creditCardHolderCPF=$("input[name=creditCardHolderCPF]").val().replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-')
                 dataCard.creditCardHolderBirthDate=$("input[name=creditCardHolderBirthDate]").val();
-                dataCard.creditCardHolderAreaCode=$("input[name=creditCardHolderAreaCode]").val();
-                dataCard.creditCardHolderPhone=$("input[name=creditCardHolderPhone]").val();
-                dataCard.billingAddressStreet=$("input[name=billingAddressStreet]").val();
-                dataCard.billingAddressNumber=$("input[name=billingAddressNumber]").val();
-                dataCard.billingAddressComplement=$("input[name=billingAddressComplement]").val();
-                dataCard.billingAddressDistrict=$("input[name=billingAddressDistrict]").val();
-                dataCard.billingAddressPostalCode=$("input[name=billingAddressPostalCode]").val();
-                dataCard.billingAddressCity=$("input[name=billingAddressCity]").val();
-                dataCard.billingAddressState=$("input[name=billingAddressState]").val();
-                dataCard.billingAddressCountry=$("input[name=billingAddressCountry]").val();
+                dataCard.creditCardHolderAreaCode=$("input[name=creditCardHolderAreaCode]").val().replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-')
+                dataCard.creditCardHolderPhone=$("input[name=creditCardHolderPhone]").val().replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-')
 
                 if( $("select[name=installmentQuantity]").val() > 1 ){
                     dataCard.noInterestInstallmentQuantity=$("select[name=installmentQuantity]").val()
@@ -431,33 +417,6 @@ $meta = $app->metadata();
 
             if( paymentMethod == 'eft' ) {
                 dataCard.bankName=$("input[name=eftName]").val();
-                dataCard.senderName=$("#debit input[name=creditCardHolderName]").val();
-                dataCard.senderAreaCode=$("#debit input[name=creditCardHolderAreaCode]").val()
-                dataCard.senderPhone=$("#debit input[name=creditCardHolderPhone]").val()
-                dataCard.senderCPF=$("#debit input[name=creditCardHolderCPF]").val();
-                dataCard.shippingAddressStreet=$("#debit input[name=shippingAddressStreet]").val();
-                dataCard.shippingAddressNumber=$("#debit input[name=shippingAddressNumber]").val();
-                dataCard.shippingAddressComplement=$("#debit input[name=shippingAddressComplement]").val();
-                dataCard.shippingAddressDistrict=$("#debit input[name=shippingAddressDistrict]").val();
-                dataCard.shippingAddressPostalCode=$("#debit input[name=shippingAddressPostalCode]").val();
-                dataCard.shippingAddressCity=$("#debit input[name=shippingAddressCity]").val();
-                dataCard.shippingAddressState=$("#debit input[name=shippingAddressState]").val();
-                dataCard.shippingAddressCountry=$("#debit input[name=shippingAddressCountry]").val();
-            }
-
-            if( paymentMethod == 'boleto' ) {
-                dataCard.senderCPF=$("#boleto input[name=creditCardHolderCPF]").val();
-                dataCard.senderName=$("#boleto input[name=creditCardHolderName]").val();
-                dataCard.senderAreaCode=$("#boleto input[name=creditCardHolderAreaCode]").val()
-                dataCard.senderPhone=$("#boleto input[name=creditCardHolderPhone]").val()
-                dataCard.shippingAddressStreet=$("#boleto input[name=shippingAddressStreet]").val();
-                dataCard.shippingAddressNumber=$("#boleto input[name=shippingAddressNumber]").val();
-                dataCard.shippingAddressComplement=$("#boleto input[name=shippingAddressComplement]").val();
-                dataCard.shippingAddressDistrict=$("#boleto input[name=shippingAddressDistrict]").val();
-                dataCard.shippingAddressPostalCode=$("#boleto input[name=shippingAddressPostalCode]").val();
-                dataCard.shippingAddressCity=$("#boleto input[name=shippingAddressCity]").val();
-                dataCard.shippingAddressState=$("#boleto input[name=shippingAddressState]").val();
-                dataCard.shippingAddressCountry=$("#boleto input[name=shippingAddressCountry]").val();
             }
 
             return dataCard;
@@ -471,6 +430,7 @@ $meta = $app->metadata();
 
         var sendPayment = function ( type = 'debit' ) {
                 var data = getDataOrder();
+                console.log('data', data)
                 var error = false
                 $.each(data, function(idx, itm){
                     if(itm == ''){
