@@ -16,7 +16,7 @@ $('.generate').on('click', function(){
   $(this).addClass('loading')
 })
 $('.searchzipcode').on('click', function(){
-  pesquisacep( $("input[name=shippingAddressStreet]").val() )
+  pesquisacep( $("input[name=shippingAddressPostalCode]").val() )
 })
 
 function limpa_formulário_cep() {
