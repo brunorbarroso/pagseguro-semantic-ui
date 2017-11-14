@@ -34,10 +34,12 @@ function limpa_formulário_cep() {
       if (!("erro" in conteudo)) {
           //Atualiza os campos com os valores.
           $("input[name=shippingAddressStreet]").val(conteudo.logradouro)
-          $("select[name=shippingAddressCity]").val(conteudo.localidade).change()
-          $("select[name=shippingAddressState]").val(conteudo.uf).change()
+          $("select[name=shippingAddressState]").val(conteudo.uf).change()    
           $("input[name=shippingAddressDistrict]").val(conteudo.bairro);
           $("textarea[name=shippingAddressComplement]").val(conteudo.complemento)
+          setTimeout(function() {
+            $("select[name=shippingAddressCity]").val(conteudo.localidade).change()  
+          }, 500);
       } //end if.
       else {
           //CEP não Encontrado.
@@ -101,3 +103,35 @@ function limpa_formulário_cep() {
   $('.phone').mask('0.0000-0000');
   $('.placeholder').mask("00/00/0000", {placeholder: "__/__/____"});
   $('.cpf').mask('000.000.000-00', {reverse: true});
+
+  $.getJSON('assets/estados_cidades.json', function (data) {
+    var items = [];
+    var options = '<option value="">Escolha um estado</option>';	
+    $.each(data, function (key, val) {
+        options += '<option value="' + val.sigla + '">' + val.nome + '</option>';
+    });
+    
+    $("#estados").html(options);				
+    
+    $("#estados").change(function () {				
+    
+        var options_cidades = '';
+        var str = "";					
+        
+        $("#estados option:selected").each(function () {
+            str += $(this).text();
+        });
+        
+        $.each(data, function (key, val) {
+            if(val.nome == str) {							
+                $.each(val.cidades, function (key_city, val_city) {
+                    options_cidades += '<option value="' + val_city + '">' + val_city + '</option>';
+                });							
+            }
+        });
+        
+        $("#cidades").html(options_cidades);
+        
+    }).change();		
+
+});

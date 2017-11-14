@@ -83,51 +83,21 @@ $meta = $app->metadata();
       <div class="two fields">
         <div class="field">
           <label>Estado</label>
-          <select name="shippingAddressState" class="ui fluid dropdown">
+          <select name="shippingAddressState" id="estados" class="ui fluid dropdown">
             <option value="">Escolha...</option>
-            <option value="a">Acre</option>
-            <option value="a">Alagoas</option>
-            <option value="a">Amapá</option>
-            <option value="a">Amazonas</option>
-            <option value="a">Bahia</option>
-            <option value="CE">Ceará</option>
-            <option value="a">Distrito Federal</option>
-            <option value="a">Espírito Santo</option>
-            <option value="a">Goiás</option>
-            <option value="a">Maranhão</option>
-            <option value="a">Mato Grosso</option>
-            <option value="a">Mato Grosso do Sul</option>
-            <option value="a">Minas Gerais</option>
-            <option value="a">Pará</option>
-            <option value="a">Paraíba</option>
-            <option value="a">Paraná</option>
-            <option value="a">Pernambuco</option>
-            <option value="a">Piauí</option>
-            <option value="a">Rio de Janeiro</option>
-            <option value="a">Rio Grande do Norte</option>
-            <option value="a">Rio Grande do Sul</option>
-            <option value="a">Rondônia</option>
-            <option value="a">Roraima</option>
-            <option value="a">Santa Catarina</option>
-            <option value="a">São Paulo</option>
-            <option value="a">Sergipe</option>
-            <option value="a">Tocantins</option>
           </select>
         </div>
         <div class="field">
           <label>Cidade</label>
-          <select name="shippingAddressCity" class="ui fluid dropdown">
+          <select name="shippingAddressCity" id="cidades" class="ui fluid dropdown">
             <option value="">Escolha...</option>
-            <option value="Maracanaú">Maracanaú</option>
-            <option value="Fortaleza">Fortaleza</option>
-            <option value="a">Madalena</option>
           </select>
         </div>
-        <input type="hidden" name="shippingAddressCountry" value="BR">
         <div class="field">
           <label>Bairro</label>
           <input type="text" name="shippingAddressDistrict" placeholder="bairro">
         </div>
+        <input type="hidden" name="shippingAddressCountry" value="BR">
       </div>
       <div class="field">
           <label>Complemento</label>
@@ -144,23 +114,23 @@ $meta = $app->metadata();
           <div class="fields">
               <div class="ten wide field">
                 <label>Nome Impresso no Cartão</label>
-                <input type="text" name="shipping[address-2]" placeholder="Nome Impresso">
+                <input type="text" name="creditCardHolderName" placeholder="Nome Impresso">
               </div>
               <div class="ten wide field">
                 <label>Número</label>
-                <input type="text" name="card[number]" maxlength="16" placeholder="Número">
+                <input type="text" name="cardNumber" maxlength="16" placeholder="Número">
               </div>
           </div>
           <div class="fields">
             <div class="three wide field">
               <label>CVC</label>
-              <input type="text" name="card[cvc]" maxlength="3" placeholder="CVC">
+              <input type="text" name="cardCvv" maxlength="3" placeholder="CVC">
             </div>
             <div class="seven wide field">
               <label>Data de Expiração</label>
               <div class="two fields">
                 <div class="field">
-                  <select class="ui fluid search dropdown" name="card[expire-month]">
+                  <select class="ui fluid search dropdown" name="cardExpirationMonth">
                     <option value="">Mês</option>
                     <option value="1">Janeiro</option>
                     <option value="2">Fevereiro</option>
@@ -177,7 +147,7 @@ $meta = $app->metadata();
                   </select>
                 </div>
                 <div class="field">
-                <select class="ui fluid search dropdown" name="card[expire-month]">
+                <select class="ui fluid search dropdown" name="cardExpirationYear">
                     <option value="">Ano</option>
                     <option value="1">2017</option>
                     <option value="2">2018</option>
@@ -198,13 +168,18 @@ $meta = $app->metadata();
               </div>
             </div>
             <div class="six wide field">
-              <label>Parcelas</label>
-              <select class="ui fluid search dropdown" name="card[expire-month]">
+                <label>Parcelas</label>
+                <select class="ui fluid search dropdown" name="installmentQuantity">
                     <option value="">Sem dados do cartão</option>
-                  </select>
+                </select>
+                <input type="hidden" name="installmentValue">
+                <input type="hidden" name="extraAmount">
+                <input type="hidden" name="creditCardToken" id="creditCardToken"  />
+                <input type="hidden" name="creditCardBrand" id="creditCardBrand"  />
+                <input type="hidden" name="creditCardBrandName" id="creditCardBrandName"  />
             </div>
           </div>
-          <button class="generate ui button green">Salvar e Realizar Pagamento</button>
+          <button class="generate ui button green" id="creditCardPaymentButton">Salvar e Realizar Pagamento</button>
         </div>
         <div class="ui tab segment" data-tab="debit">
           <div class="field">
@@ -233,10 +208,12 @@ $meta = $app->metadata();
                 </div>
               </div>
           </div>
-          <button class="generate ui button green">Salvar e Acessar o Banco</button>
+          <input type="hidden" name="eftName" />
+          <button class="generate ui button green" id="debitPaymentButton">Salvar e Acessar o Banco</button>
         </div>
         <div class="ui tab segment" data-tab="boleto">
-            <button class="generate ui button green">Salvar e Gerar Boleto</button>
+            <input type="hidden" name="senderHash" id="senderHash"  />
+            <button class="generate ui button green" id="boletoButton">Salvar e Gerar Boleto</button>
         </div>
       </div>
     </div>
@@ -251,17 +228,12 @@ $meta = $app->metadata();
 <!-- Adicionando Javascript -->
 <script type="text/javascript" >
 
-    var valueTotal = 99.00;
+        var valueTotal = 99.00;
         var paymentMethod = "eft";
 
         $(document).ready(function(){
-
             PagSeguroDirectPayment.setSessionId('<?php echo $meta['sessionId'] ?>');
-            $(".formspayment .creditcard").hide();
-            $(".formspayment .debit").hide();
-            $(".formspayment .boleto").hide();
             setFormsPayments( valueTotal );
-
         });
 
         var setError = function( msg ){
