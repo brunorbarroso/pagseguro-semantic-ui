@@ -26,13 +26,16 @@ $meta = $app->metadata();
     <div class="ui ignored error message" style="display: none">
       <p></p>
     </div>
+    <div class="ui ignored success message" style="display: none">
+      <p></p>
+    </div>
     <div class="ui form">
       <h4 class="ui dividing header">Dados do comprador</h4>
       <div class="field">
         <div class="fields">  
           <div class="twelve wide field">
             <label>Nome completo</label>
-              <input type="text" name="creditCardHolderName" placeholder="nome completo">
+              <input type="text" name="fullname" placeholder="nome completo">
           </div>
           <div class="five wide field">
             <label>Data de Nascimento</label>
@@ -224,18 +227,18 @@ $meta = $app->metadata();
         });
 
         var setError = function( msg ){
-            $('.error-order').html( msg );
-            $('.error-order').show();
+            $('.error.message').html( msg );
+            $('.error.message').show();
             setTimeout(function(){
-                $('.error-order').hide();
+                $('.error.message').hide();
             }, 6000);
         };
 
         var setSuccess = function( msg ){
-            $('.alert-order').html( msg );
-            $('.alert-order').show();
+            $('.success.message').html( msg );
+            $('.success.message').show();
             setTimeout(function(){
-                $('.alert-order').hide();
+                $('.success.message').hide();
             }, 60000);
         };
 
@@ -253,12 +256,12 @@ $meta = $app->metadata();
         });
 
         $('#creditCardPaymentButton').on('click', function () { sendPayment('creditcard') });
-        $('#debitPaymentButton').on('click', function () { sendPayment('debit') });
+        $('#debitPaymentButton').on('click', function () { sendPayment('eft') });
         $('#boletoButton').on('click', function () { sendPayment('boleto') });
 
         $("select[name=installmentQuantity]").on('change', function () {
-            $("input[name=installmentValue]").val( $( ".list-parcel option:selected" ).data('valueparcel') );
-            $("input[name=extraAmount]").val( $( ".list-parcel option:selected" ).data('extraamount') );
+            $("input[name=installmentValue]").val( $("select[name=installmentQuantity] option:selected").data('valueparcel') );
+            $("input[name=extraAmount]").val( $("select[name=installmentQuantity] option:selected").data('extraamount') );
         });
 
         var getParcelCreditCard = function(){
@@ -361,44 +364,45 @@ $meta = $app->metadata();
             });
         };
     
-        var getDataOrder = function () {
+        var getDataOrder = function (type) {
             var dataCard = {};
+
             dataCard = {
-                paymentMethod: paymentMethod,
+                paymentMethod: type,
                 receiverEmail:'brunobinfo@gmail.com',
                 itemId1:'0001',
                 itemDescription1:'Viagem Para Testar o Checkout',
                 itemAmount1:valueTotal,
                 itemQuantity1:1,
-                reference:'REF1234',
+                reference:'REF1237',
                 senderEmail:'c44686989928226966923@sandbox.pagseguro.com.br',
                 senderHash:$("input[name=senderHash]").val()
             };
 
-            dataCard.senderName=$("input[name=creditCardHolderName]").val()
+            dataCard.senderName=$("input[name=fullname]").val()
             dataCard.senderAreaCode=$("input[name=creditCardHolderAreaCode]").val().replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-')
             dataCard.senderPhone=$("input[name=creditCardHolderPhone]").val().replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-')
             dataCard.senderCPF=$("input[name=creditCardHolderCPF]").val().replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-')
 
             dataCard.shippingAddressStreet=$("input[name=shippingAddressStreet]").val()
             dataCard.shippingAddressNumber=$("input[name=shippingAddressNumber]").val()
-            dataCard.shippingAddressComplement=$("input[name=shippingAddressComplement]").val()
+            dataCard.shippingAddressComplement=$("textarea[name=shippingAddressComplement]").val()
             dataCard.shippingAddressDistrict=$("input[name=shippingAddressDistrict]").val()
             dataCard.shippingAddressPostalCode=$("input[name=shippingAddressPostalCode]").val().replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-')
             dataCard.shippingAddressCity=$("select[name=shippingAddressCity]").val()
             dataCard.shippingAddressState=$("select[name=shippingAddressState]").val()
             dataCard.shippingAddressCountry=$("input[name=shippingAddressCountry]").val()
             
-            dataCard.billingAddressStreet=$("input[name=shippingAddressStreet]").val().replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-')
+            dataCard.billingAddressStreet=$("input[name=shippingAddressStreet]").val()
             dataCard.billingAddressNumber=$("input[name=shippingAddressNumber]").val().replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-')
-            dataCard.billingAddressComplement=$("input[name=shippingAddressComplement]").val();
+            dataCard.billingAddressComplement=$("textarea[name=shippingAddressComplement]").val();
             dataCard.billingAddressDistrict=$("input[name=shippingAddressDistrict]").val();
             dataCard.billingAddressPostalCode=$("input[name=shippingAddressPostalCode]").val().replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-')
             dataCard.billingAddressCity=$("select[name=shippingAddressCity]").val();
             dataCard.billingAddressState=$("select[name=shippingAddressState]").val();
             dataCard.billingAddressCountry=$("input[name=shippingAddressCountry]").val();
 
-            if( paymentMethod == 'creditcard' ) {
+            if( type == "creditcard" ) {
 
                 dataCard.extraAmount = Number((Number($("input[name=extraAmount]").val()).toFixed(2)-valueTotal)).toFixed(2);
                 dataCard.creditCardToken=$("input[name=creditCardToken]").val();
@@ -415,7 +419,7 @@ $meta = $app->metadata();
                 }
             }
 
-            if( paymentMethod == 'eft' ) {
+            if( type == "eft" ) {
                 dataCard.bankName=$("input[name=eftName]").val();
             }
 
@@ -429,7 +433,7 @@ $meta = $app->metadata();
         };
 
         var sendPayment = function ( type = 'debit' ) {
-                var data = getDataOrder();
+                var data = getDataOrder(type);
                 console.log('data', data)
                 var error = false
                 $.each(data, function(idx, itm){
