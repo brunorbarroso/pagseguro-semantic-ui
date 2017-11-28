@@ -33,7 +33,7 @@ class App {
     {
         if ( !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest' ) {
 
-            $app = new \App\Gateway( $this->config->config['pagseguro']['mode'] );
+            $app = new \App\Gateway( $this->config['pagseguro']['mode'] );
             $order = $fields;
             $orderExtra = array('paymentMode'=>'default',
                                 'currency'=>'BRL',
@@ -41,6 +41,7 @@ class App {
     
             $order = array_merge($order, $orderExtra);
             $orderNew = array();
+            
     
             foreach($order as $idx => $od){
                 if( $idx == 'itemQuantity' 
@@ -57,11 +58,12 @@ class App {
     
                 $orderNew = array_merge($orderNew, array($idx=>$od));
             }
-                
+            
+            //print json_encode( array('status'=>'success', 'message'=>json_encode( $app->payment( $orderNew ) ) ) );
             print json_encode( $app->payment( $orderNew ) );
     
         } else {
-            print "nao é requisição ajax";
+            print json_encode( array('status'=>'error', 'message'=>'nao é requisição ajax' ) );
         }
     
     }

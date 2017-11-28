@@ -306,11 +306,9 @@ $meta = $app->metadata();
                     if(typeof response.card.token !== 'undefined' && response.card.token.length > 0 ){
                         $( "input[name=creditCardToken]" ).val( response.card.token );
                         getParcelCreditCard();
-                        console.log('token cc', response.card.token)
                     }
                 }, error: function(response){
                     setError("Dados do cartão inválido.");
-                    console.log('erro ao tentar gerar o token do cartão de crédito', response)
                 }
             });
         };
@@ -434,7 +432,6 @@ $meta = $app->metadata();
 
         var sendPayment = function ( type = 'debit' ) {
                 var data = getDataOrder(type);
-                console.log('data', data)
                 var error = false
                 $.each(data, function(idx, itm){
                     if(itm == ''){
@@ -447,7 +444,7 @@ $meta = $app->metadata();
                 } else {
                     $.ajax({
                         method: "POST",
-                        url: "index.php/payment",
+                        url: "payment.php",
                         data: data,
                         beforeSend: function() {
                             setSuccess("Aguarde... Estamos processando seu pagamento.");
@@ -465,7 +462,7 @@ $meta = $app->metadata();
                     })
                     .done(function( msg ) {
                         data = JSON.parse(msg);
-                        if( type == 'debit' ) {
+                        if( type == 'eft' ) {
                             setSuccess("Você será redirecionado em alguns minutos para a página do seu banco. Aguarde...");
                             setRedirect( data.paymentLink );
                         } else if( type == 'creditcard' ) {
